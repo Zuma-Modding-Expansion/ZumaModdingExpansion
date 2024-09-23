@@ -127,7 +127,6 @@ int gPrevColor = 0xffffffff;
 SpriteMgr::SpriteMgr()
 {
     mHasBackground = false;
-    mNumHoles = 0;
     mInSpace = false;
     mSpaceScroll = true;
     mNebulaImage = NULL;
@@ -161,7 +160,6 @@ void SpriteMgr::AddSprite(Image *theImage, int x, int y, int thePriority)
 void SpriteMgr::SetupLevel(const LevelDesc &theLevel, MirrorType theMirror)
 {
     mStarList.clear();
-    mNumHoles = 0;
     mUpdateCnt = 0;
 
     int aStarColors[] = {
@@ -198,9 +196,15 @@ void SpriteMgr::SetupLevel(const LevelDesc &theLevel, MirrorType theMirror)
         mSprites[i].clear();
 
     mHoleFlashList.clear();
+    mHoleInfo.clear();
 
     Graphics g(mBackgroundImage);
     MemoryImage *anImage;
+
+
+    for (int i = 0; i < theLevel.mCurveDesc.size(); i++) {
+        mHoleInfo.push_back(HoleInfo(theLevel.mCurveDesc.size()));
+    }
 
     if (!theLevel.mImagePath.empty() && (anImage = gSexyAppBase->GetImage(theLevel.mImagePath), ImageMirror(anImage, theMirror), anImage))
     {
@@ -455,10 +459,10 @@ void SpriteMgr::UpdateHoles()
             aBrightness = 0;
         }
 
-        HoleInfo &aHole = mHoleInfo[mHoleMappings[aFlash.mCurveNum]];
+        HoleInfo &aHole = mHoleInfo[aFlash.mCurveNum];
         aHole.mBrightness[aFlash.mCurveNum] = aBrightness;
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < aHole.mBrightness.size(); i++)
         {
             if (aBrightness < aHole.mBrightness[i])
                 aBrightness = aHole.mBrightness[i];
@@ -506,11 +510,11 @@ void SpriteMgr::InitStars() {}
 
 void SpriteMgr::UpdateHole(int theCurveNum, float thePercentOpen)
 {
-    HoleInfo &aHole = mHoleInfo[mHoleMappings[theCurveNum]];
+    HoleInfo &aHole = mHoleInfo[theCurveNum];
     aHole.mPercentOpen[theCurveNum] = thePercentOpen;
 
     float v4 = thePercentOpen;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < mHoleInfo.size(); i++)
     {
         thePercentOpen = max(aHole.mPercentOpen[i], thePercentOpen);
     }
@@ -550,51 +554,31 @@ void SpriteMgr::PlaceHole(int theCurveNum, int theX, int theY, float theRotation
     if (fabs(theRotation - SEXY_PI * 2) < 0.2)
         theRotation = 0.0;
 
-    int i;
-    for (i = 0; i < mNumHoles; i++)
-    {
-        HoleInfo &aHole = mHoleInfo[i];
+    HoleInfo& aHole = mHoleInfo[theCurveNum];
 
-        if ((aHole.my - aCornerY) * (aHole.my - aCornerY) + (aHole.mx - aCornerX) * (aHole.mx - aCornerX) < 400)
-        {
-            break;
-        }
-    }
-
-    if (i == mNumHoles)
-    {
-        HoleInfo &aHole = mHoleInfo[i];
-
-        aHole.mx = aCornerX;
-        aHole.my = aCornerY;
-        aHole.mFrame = 0;
-        aHole.mTotalBrightness = 0;
-        aHole.mImageFrame = -1;
-        aHole.mRotation = theRotation;
-
-        for (int j = 0; j < 3; j++)
-        {
-            aHole.mPercentOpen[j] = 0.0;
-            aHole.mBrightness[j] = 0;
-        }
-
-        mNumHoles++;
-    }
-
-    mHoleMappings[theCurveNum] = i;
+    // TODO: do not render if both at same place
+    
+    aHole.mx = aCornerX;
+    aHole.my = aCornerY;
+    aHole.mFrame = 0;
+    aHole.mTotalBrightness = 0;
+    aHole.mImageFrame = -1;
+    aHole.mRotation = theRotation;
 }
 
 void SpriteMgr::ClearHoleFlashes()
 {
     mHoleFlashList.clear();
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < mHoleInfo.size(); i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < mHoleInfo[i].mBrightness.size(); j++)
         {
             mHoleInfo[i].mBrightness[j] = 0;
         }
 
+        mHoleInfo[i].mFrame = 0;
+        mHoleInfo[i].mImageFrame = -1;
         mHoleInfo[i].mTotalBrightness = 0;
     }
 }
@@ -698,10 +682,29 @@ void SpriteMgr::DrawBackground(Graphics *g)
         g->DrawImage(mBackgroundImage, 0, 0);
     }
 
-    for (int i = 0; i < mNumHoles; i++)
+    /*for (int i = 0; i < mHoleInfo.size(); i++)
     {
         DrawHole(g, i);
 
+        if (mHoleInfo[i].mTotalBrightness > 0)
+        {
+            g->SetDrawMode(Graphics::DRAWMODE_ADDITIVE);
+            g->SetColorizeImages(true);
+
+            g->SetColor(Sexy::Color(mHoleInfo[i].mTotalBrightness, mHoleInfo[i].mTotalBrightness, mHoleInfo[i].mTotalBrightness));
+            DrawHole(g, i);
+
+            g->SetColorizeImages(false);
+            g->SetDrawMode(Graphics::DRAWMODE_NORMAL);
+        }
+    }*/
+    for (int i = 0; i < mHoleInfo.size(); i++)
+    {
+        DrawHole(g, i);
+    }
+
+    for (int i = 0; i < mHoleInfo.size(); i++)
+    {
         if (mHoleInfo[i].mTotalBrightness > 0)
         {
             g->SetDrawMode(Graphics::DRAWMODE_ADDITIVE);

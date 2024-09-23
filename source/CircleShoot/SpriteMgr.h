@@ -61,10 +61,15 @@ protected:
 		int mFrame;
 		int mTotalBrightness;
 		float mRotation;
-		float mPercentOpen[3];
-		int mBrightness[3];
+		std::vector<float> mPercentOpen;
+		std::vector<int> mBrightness;
 
-		HoleInfo() : mImage(NULL) { }
+		HoleInfo(int curve_num) : mImage(NULL) {
+			for (int i = 0; i < curve_num; i++) {
+				mPercentOpen.push_back(0);
+				mBrightness.push_back(0);
+			}
+		}
 		virtual ~HoleInfo();
 	};
 
@@ -76,9 +81,7 @@ protected:
 	typedef std::list<HoleFlash> HoleFlashList;
 	HoleFlashList mHoleFlashList;
 
-	int mNumHoles;
-	int mHoleMappings[3];
-	HoleInfo mHoleInfo[3];
+	std::vector<HoleInfo> mHoleInfo;
 
 	void DrawSprites(Graphics *g, const SpriteList &theList);
 	void DrawSpace(Graphics *g);

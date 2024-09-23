@@ -12,8 +12,10 @@
 #include "Gun.h"
 #include "Res.h"
 #include "DataSync.h"
+#include "ProfileMgr.h"
 
 #include <math.h>
+#include "CircleShootApp.h"
 
 using namespace Sexy;
 
@@ -267,6 +269,8 @@ bool Gun::StartFire(bool recoil)
     mBlinkCount = 25;
 
     CalcAngle();
+
+    GetCircleShootApp()->mProfile->mUserStats.mFiredBallAmount++;
 
     return true;
 }

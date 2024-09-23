@@ -66,15 +66,11 @@ LevelDesc::LevelDesc()
 
 int LevelDesc::GetNumCurves()
 {
-    int nCurves = 0;
-
-    for (int i = 0; i < 3; i++)
-    {
-        if (mCurveDesc[i].mPath.length() != 0)
-            nCurves++;
+    int i = 0;
+    for (CurveDesc j : mCurveDesc) {
+        i++;
     }
-
-    return nCurves;
+    return i;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -369,17 +365,47 @@ std::string LevelParser::GetPath(const std::string &theStr)
     }
 }
 
+void CopyCurveSettings(CurveDesc* to, CurveDesc* from) {
+    to->mSpeed = from->mSpeed;
+    to->mStartDistance = from->mStartDistance;
+    to->mMergeSpeed = from->mMergeSpeed;
+    to->mBallRepeat = from->mBallRepeat;
+    to->mMaxSingle = from->mMaxSingle;
+    to->mSlowFactor = from->mSlowFactor;
+    to->mSlowDistance = from->mSlowDistance;
+    to->mAccelerationRate = from->mAccelerationRate;
+    to->mScoreTarget = from->mScoreTarget;
+    to->mZumaBack = from->mZumaBack;
+    to->mZumaSlow = from->mZumaSlow;
+    to->mMaxSpeed = from->mMaxSpeed;
+    for (int j = 0; j < PowerType_Max; j++) {
+        to->mPowerUpFreq[j] = from->mPowerUpFreq[j];
+    }
+    to->mDestroyAll = from->mDestroyAll;
+}
+
 void LevelParser::CopyGraphics(LevelDesc &to, LevelDesc &from)
 {
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < from.mCurveDesc.size(); i++)
     {
-        to.mCurveDesc[i].mPath = from.mCurveDesc[i].mPath;
-        to.mCurveDesc[i].mDangerDistance = from.mCurveDesc[i].mDangerDistance;
-        to.mCurveDesc[i].mDrawCurve = from.mCurveDesc[i].mDrawCurve;
-        to.mCurveDesc[i].mDrawTunnels = from.mCurveDesc[i].mDrawTunnels;
-        to.mCurveDesc[i].mCurveColor = from.mCurveDesc[i].mCurveColor;
-        to.mCurveDesc[i].mSkullRotation = from.mCurveDesc[i].mSkullRotation;
+        CurveDesc *todesc;
+        if (i >= to.mCurveDesc.size()) {
+            todesc = new CurveDesc();
+        }
+        else {
+            todesc = &to.mCurveDesc[i];
+        }
+        CurveDesc fromdesc = from.mCurveDesc[i];
+        todesc->mPath = fromdesc.mPath;
+        todesc->mDangerDistance = fromdesc.mDangerDistance;
+        todesc->mDrawCurve = fromdesc.mDrawCurve;
+        todesc->mDrawTunnels = fromdesc.mDrawTunnels;
+        todesc->mCurveColor = fromdesc.mCurveColor;
+        todesc->mSkullRotation = fromdesc.mSkullRotation;
+        if (i >= to.mCurveDesc.size()) {
+            to.mCurveDesc.push_back(*todesc);
+        }
     }
 
     to.mGunX = from.mGunX;
@@ -588,25 +614,23 @@ void GetCurveAttribute(
 
         int aNameSize = aName.size();
         int aDigit;
-        int aStartCurve;
-        int aEndCurve;
 
         if (aNameSize != 0 && (aDigit = aName[aNameSize - 1] - '0', aDigit <= 9))
         {
-            aEndCurve = aDigit;
             aName.resize(aNameSize - 1);
-            aStartCurve = aEndCurve;
         }
         else
         {
-            aStartCurve = 0;
-            aEndCurve = 2;
         }
 
-        for (int i = aStartCurve; i < aEndCurve; i++)
-        {
-            char *aPtr = ((char *)&theDesc.mCurveDesc[i]) + theOffset;
-            theParser(anItr->second.c_str(), (void *)aPtr);
+        if (theElem.mValue == "Settings" && theDesc.mCurveDesc.empty()) {
+            theDesc.mCurveDesc.push_back(CurveDesc());
+        }
+
+        for (int i = 0; i < theDesc.mCurveDesc.size(); i++) {
+            CurveDesc *desc = &theDesc.mCurveDesc[i];
+            char* aPtr = ((char*)desc) + theOffset;
+            theParser(anItr->second.c_str(), (void*)aPtr);
         }
 
         anItr++;
@@ -650,7 +674,23 @@ bool LevelParser::DoParseLevel(XMLElement &theElem, bool isLevel)
         aDesc = anItr->second;
     }
 
-    for (int i = 0; i < 3; i++)
+    int curve_id = 1;
+    std::string str = Sexy::StrFormat("curve%d", curve_id);
+
+    bool next_attribute = GetAttribute(theElem, str, aVal);
+    if (!next_attribute) {
+        next_attribute = GetAttribute(theElem, "curve", aVal);
+    }
+
+    while (next_attribute) {
+        CurveDesc desc = CurveDesc();
+        aDesc.mCurveDesc.push_back(desc);
+        curve_id++;
+        str = Sexy::StrFormat("curve%d", curve_id);
+        next_attribute = GetAttribute(theElem, str, aVal);
+    }
+
+    for (int i = 0; i < aDesc.GetNumCurves(); i++)
     {
         if (GetAttribute(theElem, Sexy::StrFormat("settings%d", i + 1), aVal))
         {
@@ -715,27 +755,15 @@ bool LevelParser::DoParseLevel(XMLElement &theElem, bool isLevel)
     int aPowerFreq = 0;
     if (GetAttribute(theElem, "powerfreq", aVal) && sscanf(aVal.c_str(), "%d", &aPowerFreq) == 1)
     {
-        for (int i = 0; i < 3; i++)
+        for (CurveDesc desc : aDesc.mCurveDesc)
         {
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < PowerType_Max; j++)
             {
-                if (aDesc.mCurveDesc[i].mPowerUpFreq[j] > 0)
-                    aDesc.mCurveDesc[i].mPowerUpFreq[j] = aPowerFreq;
+                if (desc.mPowerUpFreq[j] > 0)
+                    desc.mPowerUpFreq[j] = aPowerFreq;
             }
         }
     }
-
-    if (GetAttribute(theElem, "curve", aVal))
-        aDesc.mCurveDesc[0].mPath = GetPath(aVal);
-
-    if (GetAttribute(theElem, "curve1", aVal))
-        aDesc.mCurveDesc[0].mPath = GetPath(aVal);
-
-    if (GetAttribute(theElem, "curve2", aVal))
-        aDesc.mCurveDesc[1].mPath = GetPath(aVal);
-
-    if (GetAttribute(theElem, "curve3", aVal))
-        aDesc.mCurveDesc[2].mPath = GetPath(aVal);
 
     GetCurveAttribute(aDesc, theElem, "curvecolor", offsetof(CurveDesc, mCurveColor), ParseHex);
     GetCurveAttribute(aDesc, theElem, "drawcurve", offsetof(CurveDesc, mDrawCurve), ParseBool);
@@ -763,7 +791,18 @@ bool LevelParser::DoParseLevel(XMLElement &theElem, bool isLevel)
     GetCurveAttribute(aDesc, theElem, "zumaslow", offsetof(CurveDesc, mZumaSlow), ParseInt);
     GetCurveAttribute(aDesc, theElem, "zumaback", offsetof(CurveDesc, mZumaBack), ParseInt);
 
-    if (aDesc.mParTime == 0)
+    for (int id = 0; id < aDesc.GetNumCurves(); id++) {
+        CurveDesc *desc = &aDesc.mCurveDesc.at(id);
+        std::string str = Sexy::StrFormat("curve%d", id+1);
+        next_attribute = GetAttribute(theElem, str, aVal);
+        if (id == 0 && next_attribute == false) {
+            next_attribute = GetAttribute(theElem, "curve", aVal);
+        }
+        if (desc->mPath.empty())
+            desc->mPath = GetPath(aVal);
+    }
+
+    if (aDesc.mParTime == 0 && aDesc.GetNumCurves() > 0)
     {
         aDesc.mParTime = 35 * aDesc.mCurveDesc[0].mScoreTarget / 1000;
 
@@ -775,10 +814,10 @@ bool LevelParser::DoParseLevel(XMLElement &theElem, bool isLevel)
         aDesc.mParTime = 5 * ((aDesc.mParTime + 4) / 5);
     }
 
-    for (int i = 0; i < 3; i++)
-    {
-        if (aDesc.mCurveDesc[i].mSlowSpeed != 0.0f)
-            aDesc.mCurveDesc[i].mSlowFactor = aDesc.mCurveDesc[i].mSpeed / aDesc.mCurveDesc[i].mSlowSpeed;
+
+    for (CurveDesc desc : aDesc.mCurveDesc) {
+        if (desc.mSlowSpeed != 0.0f)
+            desc.mSlowFactor = desc.mSpeed / desc.mSlowSpeed;
     }
 
     if (isLevel && GetAttribute(theElem, "progression", aVal))
@@ -806,6 +845,12 @@ bool LevelParser::DoParseLevel(XMLElement &theElem, bool isLevel)
             LevelDesc &aProgDesc = mLevels.back();
             CopyGraphics(aProgDesc, aDesc);
 
+            CurveDesc* settingDesc = &mSettingsMap[anItr->first].mCurveDesc[0];
+            for (int i = 0; i < aProgDesc.GetNumCurves(); i++) { 
+                CurveDesc* desc = &aProgDesc.mCurveDesc[i];
+                CopyCurveSettings(desc, settingDesc);
+            }
+
             aProgDesc.mDifficulty = anItr->second + aDifficultyDiff;
             aProgDesc.mParTime += aParDiff;
 
@@ -818,6 +863,20 @@ bool LevelParser::DoParseLevel(XMLElement &theElem, bool isLevel)
     }
     else
     {
+        /*CurveDesc* settingDesc = &mSettingsMap[anItr->first].mCurveDesc[0];
+        for (int i = 0; i < aProgDesc.GetNumCurves(); i++) { // TODO: I'd love to do it an other way
+            CurveDesc* desc = &aProgDesc.mCurveDesc[i];
+            desc->mSpeed = settingDesc->mSpeed;
+            desc->mStartDistance = settingDesc->mStartDistance;
+            desc->mScoreTarget = settingDesc->mScoreTarget;
+            desc->mSlowFactor = settingDesc->mSlowFactor;
+            desc->mMaxSingle = settingDesc->mMaxSingle;
+            for (int j = 0; j < PowerType_Max; j++) {
+                desc->mPowerUpFreq[j] = settingDesc->mPowerUpFreq[j];
+            }
+            desc->mBallRepeat = settingDesc->mBallRepeat;
+        }*/
+
         if (aDesc.mName.empty())
             aDesc.mName = aName;
 
@@ -871,12 +930,14 @@ bool LevelParser::DoParseTreasure(XMLElement &theElem, TreasurePoint &thePoint)
     if (GetAttribute(theElem, "y", aVal))
         ParseInt(aVal.c_str(), &thePoint.y);
 
-    for (int i = 0; i < 3; i++)
-    {
-        if (GetAttribute(theElem, Sexy::StrFormat("dist%d", i + 1), aVal))
-            ParseInt(aVal.c_str(), &thePoint.mCurveDist[i]);
-        else
-            thePoint.mCurveDist[i] = 0;
+    int i = 0;
+    bool valid = true;
+    while (valid) {
+        if (!GetAttribute(theElem, Sexy::StrFormat("dist%d", i + 1), aVal))
+            break;
+        thePoint.mCurveDist.push_back(0);
+        ParseInt(aVal.c_str(), &thePoint.mCurveDist.at(i));
+        i++;
     }
 
     return true;
@@ -994,6 +1055,9 @@ bool LevelParser::DoParseStageProgression(XMLElement &theElem, int theStage)
                 *anItr = aDescItr->second;
                 anItr->mName = aName;
                 CopyGraphics(*anItr, GetLevelByName(anItr->mName, 0));
+                for (int j = 0; j < anItr->mCurveDesc.size(); j++) {
+                    CopyCurveSettings(&anItr->mCurveDesc[j], &aDescItr->second.mCurveDesc[0]);
+                }
             }
 
             anItr->mStage = theStage;

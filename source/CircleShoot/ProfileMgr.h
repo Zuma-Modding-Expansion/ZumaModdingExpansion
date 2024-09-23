@@ -12,6 +12,28 @@ class DataSync;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+
+class UserStatistics
+{
+public:
+	int mFiredBallAmount;
+	int mChainAmount;
+	int mMaxChain;
+	int mComboAmount;
+	int mMaxCombo;
+	int mGapAmount;
+	int mMaxScore;
+	int mCoinAmount;
+	int mLiveLost;
+	int mLiveEarned;
+
+	UserStatistics();
+
+	void SyncStats(DataSync& theSync);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 class UserProfile
 {
 public:
@@ -26,6 +48,7 @@ public:
 	bool mShowHelpScreen;
 	bool mHasWon;
 	bool mNeedGauntletBlink;
+	UserStatistics mUserStats;
 
 	typedef std::map<std::string,int> BoardMap;
 	BoardMap mMaxBoardLevel;

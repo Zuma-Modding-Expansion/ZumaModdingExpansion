@@ -61,7 +61,7 @@ namespace Sexy
         CircleButton *mArcadeButton;
         CircleButton *mGauntletButton;
         CircleButton *mOptionsButton;
-        CircleButton *mMoreGamesButton;
+        CircleButton *mStatsButton;
         CircleButton *mQuitButton;
         HyperlinkWidget *mNotYouLink;
         MainMenuOverlay *mMainMenuOverlay;

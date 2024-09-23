@@ -162,12 +162,6 @@ Board::Board(CircleShootApp *theApp)
     mShowBallsDuringPause = false;
     mShowParTimer = false;
 
-    for (int i = 0; i < MAX_CURVES; i++)
-    {
-        mCurveMgr[i] = new CurveMgr(this);
-        mNextCurveMgr[i] = new CurveMgr(this);
-    }
-
     mSpriteMgr = new SpriteMgr();
     mNextSpriteMgr = new SpriteMgr();
     mParticleMgr = new ParticleMgr(this);
@@ -182,10 +176,13 @@ Board::~Board()
 {
     WaitForLoadingThread();
     DeleteBullets();
-    for (int i = 0; i < MAX_CURVES; i++)
+    for (int i = 0; i < mCurveMgr.size(); i++)
     {
-        delete mCurveMgr[i];
-        delete mNextCurveMgr[i];
+        delete mCurveMgr.at(i);
+    }
+    for (int i = 0; i < mNextCurveMgr.size(); i++)
+    {
+        delete mNextCurveMgr.at(i);
     }
     delete mSpriteMgr;
     delete mNextSpriteMgr;
@@ -220,22 +217,24 @@ void Board::LoadProc()
 
         mNextSpriteMgr->SetupLevel(*mNextLevelDesc, MirrorType_None);
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < mNextLevelDesc->GetNumCurves(); i++)
         {
-            mNextCurveMgr[i]->SetupLevel(mNextLevelDesc, mNextSpriteMgr, i, MirrorType_None);
+            if (i >= mNextCurveMgr.size())
+                mNextCurveMgr.push_back(new CurveMgr(this));
+            mNextCurveMgr.at(i)->SetupLevel(mNextLevelDesc, mNextSpriteMgr, i, MirrorType_None);
         }
 
         CurveDrawer aCurveDrawer(mSpriteMgr);
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < mNextLevelDesc->GetNumCurves(); i++)
         {
-            if (mNextLevelDesc->mCurveDesc[i].mDrawCurve && mNextLevelDesc->mCurveDesc[i].mDrawTunnels)
-                mNextCurveMgr[i]->DrawTunnel(aCurveDrawer);
+            if (mNextLevelDesc->mCurveDesc.at(i).mDrawCurve && mNextLevelDesc->mCurveDesc.at(i).mDrawTunnels)
+                mNextCurveMgr.at(i)->DrawTunnel(aCurveDrawer);
         }
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < mNextLevelDesc->GetNumCurves(); i++)
         {
-            if (mNextLevelDesc->mCurveDesc[i].mDrawCurve)
-                mNextCurveMgr[i]->DrawCurve(aCurveDrawer);
+            if (mNextLevelDesc->mCurveDesc.at(i).mDrawCurve)
+                mNextCurveMgr.at(i)->DrawCurve(aCurveDrawer);
         }
 
         aCurveDrawer.AddCurvesToMgr();
@@ -288,6 +287,9 @@ void Board::StartLevel()
     mGun->SetFireSpeed(mLevelDesc->mFireSpeed);
     mGun->SetPos(mLevelDesc->mGunX, mLevelDesc->mGunY);
     mSoundMgr->PlayLoop(LoopType_RollIn);
+    for (CurveMgr* i : mCurveMgr) {
+        i->StartLevel();
+    }
     mLevelBeginning = true;
 }
 
@@ -307,7 +309,7 @@ void Board::SetLosing()
         mGun->EmptyBullets();
     }
 
-    for (int i = 0; i < mNumCurves; i++)
+    for (int i = 0; i < mCurveMgr.size(); i++)
     {
         mCurveMgr[i]->SetLosing();
     }
@@ -316,6 +318,7 @@ void Board::SetLosing()
     mGameState = GameState_Losing;
     mStateCount = 0;
     mLives = mLives - 1;
+    GetCircleShootApp()->mProfile->mUserStats.mLiveLost++;
 
     if (mLives <= 0)
     {
@@ -365,7 +368,7 @@ void Board::DoLevelUp(bool playSounds, bool isCheat)
 
         mParticleMgr->AddFloatingText(600 - aTextWidth, 440, 0xFFFFFF, mVerboseLevelString, Sexy::FONT_HUGE_ID, 0, 0, 150, true);
 
-        for (int i = 0; i < mNumCurves; i++)
+        for (int i = 0; i < mCurveMgr.size(); i++)
         {
             mCurveMgr[i]->DoEndlessZumaEffect();
             mCurveMgr[i]->SetupLevelDesc(mLevelDesc);
@@ -406,7 +409,7 @@ void Board::DoLevelUp(bool playSounds, bool isCheat)
         DoGenerateBackgroundTransitions();
     }
 
-    for (int i = 0; i < mNumCurves; i++)
+    for (int i = 0; i < mCurveMgr.size(); i++)
     {
         mCurveMgr[i]->DeleteBalls();
     }
@@ -430,7 +433,7 @@ void Board::CheckEndConditions()
         return;
 
     int i;
-    int mNumCurves = this->mNumCurves;
+    int mNumCurves = mCurveMgr.size();
     for (i = 0; i < mNumCurves; i++)
     {
         if (!mCurveMgr[i]->IsWinning())
@@ -439,7 +442,7 @@ void Board::CheckEndConditions()
         }
     }
 
-    if (i == mNumCurves)
+    if (i == mNumCurves && mNumCurves > 0)
     {
         DoLevelUp(true, false);
         return;
@@ -503,6 +506,7 @@ void Board::AdvanceFreeBullet(BulletList::iterator &theBulletItr)
         if (dx * dx + dy * dy < r * r)
         {
             ++mLevelStats.mNumGemsCleared;
+            ++GetCircleShootApp()->mProfile->mUserStats.mCoinAmount;
             FloatingTextHelper aFloat;
 
             int bonus = ((mScoreTarget - mLevelBeginScore) / 600) * 100;
@@ -551,7 +555,7 @@ void Board::AdvanceFreeBullet(BulletList::iterator &theBulletItr)
 
     if (gCheckCollision)
     {
-        for (int i = 0; i < mNumCurves; i++)
+        for (int i = 0; i < mCurveMgr.size(); i++)
         {
             if (mCurveMgr[i]->CheckCollision(aBullet))
             {
@@ -561,7 +565,7 @@ void Board::AdvanceFreeBullet(BulletList::iterator &theBulletItr)
         }
     }
 
-    for (int i = 0; i < mNumCurves; i++)
+    for (int i = 0; i < mCurveMgr.size(); i++)
     {
         mCurveMgr[i]->CheckGapShot(aBullet);
     }
@@ -594,6 +598,10 @@ void Board::UpdatePlaying()
     if (aBullet)
     {
         mBulletList.push_back(aBullet);
+        for (int i = 0; i < mCurveMgr.size(); i++)
+        {
+            aBullet->AddCurCurvePoint(0);
+        }
         CheckReload();
     }
 
@@ -604,7 +612,7 @@ void Board::UpdatePlaying()
     {
         bool stillStarting = false;
 
-        for (int i = 0; i < mNumCurves; ++i)
+        for (int i = 0; i < mCurveMgr.size(); ++i)
         {
             if (!mCurveMgr[i]->HasReachedCruisingSpeed())
             {
@@ -632,7 +640,7 @@ void Board::UpdatePlaying()
         else
         {
             mHaveReachedTarget = true;
-            for (int i = 0; i < mNumCurves; ++i)
+            for (int i = 0; i < mCurveMgr.size(); ++i)
             {
                 mCurveMgr[i]->SetStopAddingBalls(true);
 
@@ -659,7 +667,7 @@ void Board::UpdatePlaying()
             {
                 if (mStateCount - 3000 == mLevelEndFrame)
                 {
-                    for (int i = 0; i < mNumCurves; i++)
+                    for (int i = 0; i < mCurveMgr.size(); i++)
                     {
                         mLevelDesc->mCurveDesc[i].mPowerUpFreq[PowerType_Bomb] = 500;
                         mLevelDesc->mCurveDesc[i].mPowerUpFreq[PowerType_SlowDown] = 0;
@@ -678,7 +686,7 @@ void Board::UpdatePlaying()
         mTargetBarSize = 256 - (aScoreRemaining * 256 / aScoreDiff);
     }
 
-    for (int i = 0; i < mNumCurves; ++i)
+    for (int i = 0; i < mCurveMgr.size(); ++i)
     {
         mCurveMgr[i]->UpdatePlaying();
     }
@@ -798,14 +806,14 @@ void Board::UpdateGuide()
 
     Sexy::Ball *aBall = NULL;
 
-    for (int i = 0; i < mNumCurves; i++)
+    for (int i = 0; i < mCurveMgr.size(); i++)
     {
         Sexy::Ball *anIntersectBall = mCurveMgr[i]->CheckBallIntersection(g1, v1, t);
         if (anIntersectBall)
             aBall = anIntersectBall;
     }
 
-    for (int i = 0; i < mNumCurves; i++)
+    for (int i = 0; i < mCurveMgr.size(); i++)
     {
         Sexy::Ball *anIntersectBall = mCurveMgr[i]->CheckBallIntersection(g2, v1, t);
         if (anIntersectBall)
@@ -898,9 +906,9 @@ void Board::UpdateTreasure()
 
         if (!gForceTreasure)
         {
-            for (int j = 0; j < mNumCurves; j++)
+            for (int j = 0; j < mCurveMgr.size(); j++)
             {
-                if (mCurTreasure->mCurveDist[j] == 0)
+                if (j >= mCurTreasure->mCurveDist.size())
                     continue;
 
                 float aFarthestBallPercent = mCurveMgr[j]->GetFarthestBallPercent();
@@ -1060,7 +1068,7 @@ void Board::DrawPlaying(Graphics *g)
 
     if (mPauseCount == 0 || mShowBallsDuringPause)
     {
-        for (int i = 0; i < mNumCurves; i++)
+        for (int i = 0; i < mCurveMgr.size(); i++)
         {
             mCurveMgr[i]->DrawBalls(aDrawer);
         }
@@ -1283,7 +1291,7 @@ void Board::Update()
     if (gSpeedUp && !inUpdate)
     {
         inUpdate = true;
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 10; i++)
         {
             Update();
         }
@@ -1427,7 +1435,7 @@ void Board::MouseDown(int x, int y, int theClickCount)
     {
         if (mGameState == GameState_Playing)
         {
-            for (int i = 0; i < mNumCurves; i++)
+            for (int i = 0; i < mCurveMgr.size(); i++)
             {
                 if (!mCurveMgr[i]->CanFire())
                     return;
@@ -1481,7 +1489,7 @@ void Board::KeyChar(char theChar)
         mScore = mScoreTarget;
         mCurBarSize = mTargetBarSize;
 
-        for (int i = 0; i < mNumCurves; i++)
+        for (int i = 0; i < mCurveMgr.size(); i++)
         {
             mCurveMgr[i]->DetonateBalls();
         }
@@ -1591,7 +1599,7 @@ void Board::KeyChar(char theChar)
         if (mGameState == GameState_Playing)
         {
             if (c - 49 >= 0 && c - 49 < PowerType_Max)
-                mCurveMgr[Rand(mNumCurves)]->AddPowerUp((PowerType)(c - 49));
+                mCurveMgr[Rand((int)mCurveMgr.size())]->AddPowerUp((PowerType)(c - 49));
         }   
     }
     else if (c == 127) // Delete highlighted ball
@@ -1703,7 +1711,7 @@ void Board::ActivatePower(Ball *theBall)
         break;
     }
 
-    for (int i = 0; i < mNumCurves; i++)
+    for (int i = 0; i < mCurveMgr.size(); i++)
     {
         mCurveMgr[i]->ActivatePower(theBall);
     }
@@ -1726,6 +1734,13 @@ void Board::Reset(bool gameOver, bool isLevelReset)
     mContinueButton->SetVisible(false);
 
     WaitForLoadingThread();
+
+    if (mPracticeMode != PracticeMode_Single && !isLevelReset) {
+        for (CurveMgr* curve : mCurveMgr) {
+            delete curve;
+        }
+        mCurveMgr.clear();
+    }
 
     mParticleMgr->Clear();
     mTransitionMgr->Clear();
@@ -1795,15 +1810,10 @@ void Board::Reset(bool gameOver, bool isLevelReset)
     mBallColorMap.clear();
     mGun->EmptyBullets();
 
-    for (int i = 0; i < mNumCurves; i++)
-    {
-        mCurveMgr[i]->StartLevel();
-    }
-
     mDestroyAll = true;
     int aScoreTarget = 0;
 
-    for (int i = 0; i < mNumCurves; i++)
+    for (int i = 0; i < mLevelDesc->mCurveDesc.size(); i++)
     {
         if (aScoreTarget < mLevelDesc->mCurveDesc[i].mScoreTarget)
             aScoreTarget = mLevelDesc->mCurveDesc[i].mScoreTarget;
@@ -1932,7 +1942,7 @@ void Board::SyncState(DataSync &theSync)
     mTransitionMgr->SyncState(theSync);
     mSpriteMgr->SyncState(theSync);
 
-    for (int i = 0; i < mNumCurves; i++)
+    for (int i = 0; i < mCurveMgr.size(); i++)
     {
         mCurveMgr[i]->SyncState(theSync);
     }
@@ -2199,6 +2209,8 @@ void Board::IncScore(int theInc, bool delayDisplay)
     if (aScore / 50000 < (aScore + theInc) / 50000 && !mIsEndless && !mIsWinning)
     {
         mLives += (aScore + theInc) / 50000 - aScore / 50000;
+        GetCircleShootApp()->mProfile->mUserStats.mLiveEarned += (aScore + theInc) / 50000 - aScore / 50000;
+
         mLivesBlinkCount = 150;
         mApp->PlaySample(Sexy::SOUND_EXTRA_LIFE);
         mSoundMgr->AddSound(Sexy::SOUND_EXTRA_LIFE, 30);
@@ -2302,21 +2314,26 @@ void Board::SetLevelToNextLevel()
     // mLevelDesc = mNextLevelDesc;
     // mNextLevelDesc = anOldLevelDesc;
     std::swap(mLevelDesc, mNextLevelDesc);
-
-    for (int i = 0; i < 3; i++)
-    {
         // CurveMgr *aCurveMgr = mCurveMgr[i];
         // mCurveMgr[i] = mNextCurveMgr[i];
         // mNextCurveMgr[i] = aCurveMgr;
-        std::swap(mCurveMgr[i], mNextCurveMgr[i]);
-    }
+    std::swap(mCurveMgr, mNextCurveMgr);
+    //for (int i = 0; i < mNextCurveMgr.size(); i++) {
+        //mCurveMgr.at(i)->StartLevel();
+    //}
+
+    /*for (int i = 0; i < mLevelDesc->GetNumCurves(); i++)
+    {
+        CurveMgr* curve = new CurveMgr(this);
+        curve->SetupLevel(mLevelDesc, mSpriteMgr, i);
+        curve->StartLevel();
+        mCurveMgr.push_back(curve);
+    }*/
 
     // SpriteMgr *aOldSprMgr = mSpriteMgr;
     // mSpriteMgr = mNextSpriteMgr;
     // mNextSpriteMgr = aOldSprMgr;
     std::swap(mSpriteMgr, mNextSpriteMgr);
-
-    mNumCurves = mLevelDesc->GetNumCurves();
 }
 
 void Board::GetLevel(int theLevel, LevelDesc *theLevelDesc, const char *theLevelName)

@@ -73,6 +73,7 @@ CurveMgr::CurveMgr(Board *theBoard)
     mBoard = theBoard;
     mSpriteMgr = NULL; // ??
     mWayPointMgr = new WayPointMgr();
+    mLastClearedBallPoint = 0;
 }
 
 CurveMgr::~CurveMgr()
@@ -1084,6 +1085,12 @@ bool CurveMgr::CheckSet(Ball *theBall)
         mBoard->mLevelStats.mMaxComboScore = mBoard->mCurComboScore;
     }
 
+    UserStatistics* stat = &GetCircleShootApp()->mProfile->mUserStats;
+    if (aComboCount > stat->mMaxCombo) {
+        stat->mMaxCombo = aComboCount;
+    }
+    stat->mGapAmount += aNumGaps;
+
     aBall = aPrevEnd;
     while (aBall != anEndBall)
     {
@@ -1153,6 +1160,7 @@ void CurveMgr::DoScoring(Ball *theBall, int theNumBalls, int theComboCount, int 
     int aNumPoints = 100 * theComboCount + 10 * theNumBalls + theGapBonus;
     bool inARow = false;
     int aRowBonus = 0;
+    UserStatistics* stat = &GetCircleShootApp()->mProfile->mUserStats;
 
     if (mBoard->mNumClearsInARow > 4 && theComboCount == 0)
     {
@@ -1160,6 +1168,13 @@ void CurveMgr::DoScoring(Ball *theBall, int theNumBalls, int theComboCount, int 
         aNumPoints += aRowBonus;
         mBoard->mCurInARowBonus += aRowBonus;
         inARow = true;
+    }
+
+    if (mBoard->mNumClearsInARow > 1) {
+        stat->mChainAmount += 1;
+        if (mBoard->mNumClearsInARow > stat->mMaxChain) {
+            stat->mMaxChain = mBoard->mNumClearsInARow;
+        }
     }
 
     mBoard->mCurComboScore += aNumPoints;
@@ -1187,7 +1202,11 @@ void CurveMgr::DoScoring(Ball *theBall, int theNumBalls, int theComboCount, int 
         {
             mBoard->mSoundMgr->AddSound(Sexy::SOUND_GAP_BONUS, 15, 0, 2.0);
 
-            if (theNumGaps > 2)
+            if (theNumGaps > 3)
+            {
+                scoreString = "QUADRUPLE GAP BONUS";
+            }
+            else if (theNumGaps > 2)
             {
                 scoreString = "TRIPLE GAP BONUS";
             }
@@ -1697,6 +1716,8 @@ void CurveMgr::UpdateSets()
             {
                 aNextBall->SetSuckCount(10);
                 aNextBall->SetComboCount(aBall->GetComboCount() + 1, aBall->GetComboScore());
+                UserStatistics* stat = &GetCircleShootApp()->mProfile->mUserStats;
+                stat->mComboAmount += 1;
             }
 
             if (anItr == mBallList.begin())

@@ -15,11 +15,6 @@ Bullet::Bullet()
     mHitBall = NULL;
     mHitPercent = 0.0f;
     mMergeSpeed = 0.05f;
-
-    for (int i = 0; i < 3; i++)
-    {
-        mCurCurvePoint[i] = 0;
-    }
 }
 
 Bullet::~Bullet()
@@ -132,6 +127,10 @@ void Bullet::UpdateHitPos()
     mHitY = my;
 }
 
+void Bullet::AddCurCurvePoint(int theCurveNum) {
+    mCurCurvePoint.push_back(theCurveNum);
+}
+
 void Bullet::SetCurCurvePoint(int theCurveNum, int thePoint)
 {
     mCurCurvePoint[theCurveNum] = thePoint;
@@ -229,7 +228,7 @@ void Bullet::SyncState(DataSync &theSync)
     theSync.SyncFloat(mHitPercent);
     theSync.SyncFloat(mMergeSpeed);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < mCurCurvePoint.size(); i++)
     {
         theSync.SyncShort(mCurCurvePoint[i]);
     }

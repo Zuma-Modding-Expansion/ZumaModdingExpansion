@@ -39,7 +39,7 @@ namespace Sexy
 	{
 	public:
 		int x, y;
-		int mCurveDist[3];
+		std::vector<int> mCurveDist;
 	};
 	typedef std::list<TreasurePoint> TreasurePointList;
 
@@ -103,7 +103,7 @@ namespace Sexy
 		int mStage;
 		int mLevel;
 
-		CurveDesc mCurveDesc[3];
+		std::vector<CurveDesc> mCurveDesc;
 
 		LevelDesc();
 		int GetNumCurves();

@@ -272,7 +272,7 @@ int WayPointMgr::GetPriority(Bullet *theBullet)
 
 bool WayPointMgr::LoadCurve(const std::string &theFile, MirrorType theMirror)
 {
-    std::string curvePath(theFile);
+    std::string curvePath(theFile); //
 
     if (curvePath.rfind('.') == -1)
     {

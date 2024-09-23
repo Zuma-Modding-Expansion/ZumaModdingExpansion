@@ -348,7 +348,7 @@ void TransitionMgr::DrawLosing(Graphics *g)
 
     if (mBoard->mPauseCount == 0 || mBoard->mShowBallsDuringPause)
     {
-        for (int i = 0; i < mBoard->mNumCurves; i++)
+        for (int i = 0; i < mBoard->mCurveMgr.size(); i++)
         {
             mBoard->mCurveMgr[i]->DrawBalls(aDrawer);
         }
@@ -673,7 +673,7 @@ void TransitionMgr::DoLevelBegin(bool firstTime)
     }
     else
     {
-        for (int i = 0; i < mBoard->mNumCurves; ++i)
+        for (int i = 0; i < mBoard->mCurveMgr.size(); ++i)
         {
             aStagger = mBoard->mCurveMgr[i]->DrawPathSparkles(0, aStagger, 1);
         }
@@ -979,7 +979,7 @@ void TransitionMgr::DoLevelUp()
     }
 
     mQuakeFrame = 20;
-    for (int i = 0; i < mBoard->mNumCurves; i++)
+    for (int i = 0; i < mBoard->mCurveMgr.size(); i++)
     {
         if (i != 0)
             mQuakeFrame += 50;
@@ -1275,7 +1275,7 @@ void TransitionMgr::UpdateLosing()
 
     bool aCanRestart = true;
 
-    for (int i = 0; i < mBoard->mNumCurves; i++)
+    for (int i = 0; i < mBoard->mCurveMgr.size(); i++)
     {
         mBoard->mCurveMgr[i]->UpdateLosing();
         if (!mBoard->mCurveMgr[i]->CanRestart())

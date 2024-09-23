@@ -11,7 +11,7 @@ using namespace Sexy;
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-int gProfileVersion = 4;
+int gProfileVersion = 5;
 
 UserProfile::UserProfile() : mId(0), mUseSeq(0)
 {
@@ -30,7 +30,7 @@ void UserProfile::SyncDetails(DataSync &theSync)
     unsigned int aVersion = gProfileVersion;
     theSync.SyncLong(aVersion);
 
-    if (aVersion != gProfileVersion)
+    if (aVersion > gProfileVersion)
         return;
 
     theSync.SyncShort(mLastPracticeBoard);
@@ -65,6 +65,13 @@ void UserProfile::SyncDetails(DataSync &theSync)
             theSync.mWriter->WriteShort(i->second);
         }
     }
+
+    theSync.SyncBool(mNeedGauntletBlink);
+
+    if (aVersion <= 4) {
+        return;
+    }
+    mUserStats.SyncStats(theSync);
 }
 
 void UserProfile::ClearDetails()
@@ -114,7 +121,7 @@ void UserProfile::LoadDetails()
 void UserProfile::SaveDetails()
 {
     DataWriter aWriter;
-    aWriter.OpenMemory(32);
+    aWriter.OpenMemory(48);
     DataSync aSync(aWriter);
     SyncDetails(aSync);
 
@@ -179,7 +186,7 @@ void ProfileMgr::Load()
 void ProfileMgr::Save()
 {
     DataWriter aWriter;
-    aWriter.OpenMemory(32);
+    aWriter.OpenMemory(72); // 32
 
     DataSync aSync(aWriter);
     SyncState(aSync);
@@ -247,7 +254,7 @@ void ProfileMgr::SyncState(DataSync &theSync)
     unsigned int aVersion = gProfileVersion;
     theSync.SyncLong(aVersion);
 
-    if (aVersion != gProfileVersion)
+    if (aVersion > gProfileVersion)
         return;
 
     if (theSync.mReader)
@@ -354,4 +361,35 @@ bool ProfileMgr::RenameProfile(const std::string &theOldName, const std::string 
 
     anItr->second.mName = theNewName;
     return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+Sexy::UserStatistics::UserStatistics()
+{
+    mMaxScore = 0;
+    mChainAmount = 0;
+    mMaxChain = 0;
+    mComboAmount = 0;
+    mMaxCombo = 0;
+    mGapAmount = 0;
+    mCoinAmount = 0;
+    mLiveEarned = 0;
+    mLiveLost = 0;
+    mFiredBallAmount = 0;
+}
+
+void Sexy::UserStatistics::SyncStats(DataSync& theSync)
+{
+    theSync.SyncLong(mMaxScore);
+    theSync.SyncLong(mChainAmount);
+    theSync.SyncLong(mMaxChain);
+    theSync.SyncLong(mComboAmount);
+    theSync.SyncLong(mMaxCombo);
+    theSync.SyncLong(mGapAmount);
+    theSync.SyncLong(mCoinAmount);
+    theSync.SyncLong(mLiveEarned);
+    theSync.SyncLong(mLiveLost);
+    theSync.SyncLong(mFiredBallAmount);
 }

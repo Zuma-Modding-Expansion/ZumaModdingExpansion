@@ -79,12 +79,8 @@ namespace Sexy
 		friend class TransitionMgr;
 		friend class StatsDialog;
 
-		enum
-		{
-			MAX_CURVES = 3
-		};
-		CurveMgr *mCurveMgr[MAX_CURVES];
-		CurveMgr *mNextCurveMgr[MAX_CURVES];
+		std::vector<CurveMgr *> mCurveMgr;
+		std::vector<CurveMgr*> mNextCurveMgr;
 
 		SpriteMgr *mSpriteMgr;
 		SpriteMgr *mNextSpriteMgr;
@@ -93,8 +89,6 @@ namespace Sexy
 		TransitionMgr *mTransitionMgr;
 
 		int mLoadingThreadParam;
-
-		int mNumCurves;
 
 		ButtonWidget *mMenuButton;
 		ButtonWidget *mContinueButton;

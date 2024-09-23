@@ -24,6 +24,7 @@
 #include "AdventureScreen.h"
 #include "PracticeScreen.h"
 #include "MoreGamesScreen.h"
+#include "StatisticsScreen.h"
 #include "CreditsScreen.h"
 #include "HelpScreen.h"
 #include "LevelParser.h"
@@ -58,6 +59,7 @@ CircleShootApp::CircleShootApp()
     mProfile = NULL;
     mHelpScreen = NULL;
     mMoreGamesScreen = NULL;
+    mStatisticsScreen = NULL;
     mLoadingScreen = NULL;
     mCreditsScreen = NULL;
 
@@ -613,6 +615,7 @@ void CircleShootApp::FinishConfirmQuitDialog(bool confirm)
 
     if (confirm)
     {
+        SaveProfile();
         Shutdown();
     }
 }
@@ -1161,6 +1164,12 @@ void CircleShootApp::ShowMainMenu()
         mMoreGamesScreen = NULL;
     }
 
+    if (mStatisticsScreen != NULL)
+    {
+        mWidgetMover->MoveWidget(mStatisticsScreen, mStatisticsScreen->mX, mStatisticsScreen->mY, -mStatisticsScreen->mWidth, mStatisticsScreen->mY, true);
+        mStatisticsScreen = NULL;
+    }
+
     FinishOptionsDialog(true);
     CleanupWidgets();
 
@@ -1217,7 +1226,7 @@ void CircleShootApp::ShowPracticeScreen(bool fromMenu)
     if (fromMenu && CheckSaveGame(true))
         return;
 
-    MainMenu *aMainMenu = mMainMenu;
+    MainMenu* aMainMenu = mMainMenu;
     mWidgetMover->DelayDeleteWidget(mMainMenu);
     mMainMenu = NULL;
 
@@ -1231,6 +1240,30 @@ void CircleShootApp::ShowPracticeScreen(bool fromMenu)
     if (aMainMenu)
     {
         mWidgetMover->MoveWidget(mPracticeScreen, -mPracticeScreen->mWidth, 0, 0, 0, false);
+    }
+
+    PlaySong(34, true, 0.01);
+    ClearUpdateBacklog();
+}
+
+void CircleShootApp::ShowStatisticsScreen()
+{
+    mIsPractice = true;
+
+    MainMenu* aMainMenu = mMainMenu;
+    mWidgetMover->DelayDeleteWidget(mMainMenu);
+    mMainMenu = NULL;
+
+    CleanupWidgets();
+
+    mStatisticsScreen = new StatisticsScreen();
+    mStatisticsScreen->Resize(0, 0, mWidth, mHeight);
+    mWidgetManager->AddWidget(mStatisticsScreen);
+    mWidgetManager->SetFocus(mStatisticsScreen);
+
+    if (aMainMenu)
+    {
+        mWidgetMover->MoveWidget(mStatisticsScreen, -mStatisticsScreen->mWidth, 0, 0, 0, false);
     }
 
     PlaySong(34, true, 0.01);

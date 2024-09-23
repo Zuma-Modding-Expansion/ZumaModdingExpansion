@@ -40,7 +40,7 @@ namespace Sexy
 		float mMergeSpeed;
 
 		GapInfoVector mGapInfo;
-		int mCurCurvePoint[3];
+		std::vector<int> mCurCurvePoint;
 
 		void SetBallInfo(Bullet *theBullet);
 
@@ -63,6 +63,7 @@ namespace Sexy
 		bool GetHitInFront() { return mHitInFront; }
 		void UpdateHitPos();
 
+		void AddCurCurvePoint(int theCurveNum);
 		void SetCurCurvePoint(int theCurveNum, int thePoint);
 		int GetCurCurvePoint(int theCurveNum);
 

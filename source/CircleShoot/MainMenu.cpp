@@ -57,7 +57,7 @@ MainMenu::MainMenu()
     mArcadeButton = MakeButton(0, this, "", CircleButton::CB_ClickSound | CircleButton::CB_ChoralSound, Sexy::IMAGE_MM_ARCADE, 3);
     mGauntletButton = MakeButton(1, this, "", CircleButton::CB_ClickSound | CircleButton::CB_ChoralSound, Sexy::IMAGE_MM_GAUNTLET, 3);
     mOptionsButton = MakeButton(2, this, "", CircleButton::CB_ClickSound | CircleButton::CB_ChoralSound, Sexy::IMAGE_MM_OPTIONS, 3);
-    mMoreGamesButton = MakeButton(3, this, "", CircleButton::CB_ClickSound | CircleButton::CB_ChoralSound, Sexy::IMAGE_MM_MOREGAMES, 3);
+    mStatsButton = MakeButton(3, this, "Statistics", CircleButton::CB_ClickSound | CircleButton::CB_ChoralSound, Sexy::IMAGE_MM_MOREGAMES, 3);
     mQuitButton = MakeButton(4, this, "", CircleButton::CB_ClickSound | CircleButton::CB_ChoralSound, Sexy::IMAGE_MM_QUIT, 3);
 
     mEyesImage = Sexy::CutoutImageFromAlpha((MemoryImage *)Sexy::IMAGE_MM_BACK, (MemoryImage *)Sexy::IMAGE_MM_EYEMASK, mEyeCutoutPos.mX, mEyeCutoutPos.mY);
@@ -86,7 +86,7 @@ MainMenu::~MainMenu()
     delete mArcadeButton;
     delete mGauntletButton;
     delete mOptionsButton;
-    delete mMoreGamesButton;
+    delete mStatsButton;
     delete mQuitButton;
     delete mNotYouLink;
     delete mEyesImage;
@@ -127,7 +127,7 @@ void MainMenu::OrderInManagerChanged()
     mWidgetManager->PutInfront(mNotYouLink, this);
     mWidgetManager->PutInfront(mQuitButton, this);
     mWidgetManager->PutInfront(mOptionsButton, this);
-    mWidgetManager->PutInfront(mMoreGamesButton, this);
+    mWidgetManager->PutInfront(mStatsButton, this);
     mWidgetManager->PutInfront(mGauntletButton, this);
     mWidgetManager->PutInfront(mArcadeButton, this);
 }
@@ -138,7 +138,7 @@ void MainMenu::RemovedFromManager(WidgetManager *theWidgetManager)
 
     theWidgetManager->RemoveWidget(mArcadeButton);
     theWidgetManager->RemoveWidget(mGauntletButton);
-    theWidgetManager->RemoveWidget(mMoreGamesButton);
+    theWidgetManager->RemoveWidget(mStatsButton);
     theWidgetManager->RemoveWidget(mOptionsButton);
     theWidgetManager->RemoveWidget(mQuitButton);
     theWidgetManager->RemoveWidget(mNotYouLink);
@@ -161,7 +161,8 @@ void MainMenu::ButtonDepress(int theId)
         app->DoOptionsDialog();
         break;
     case 3:
-        app->ShowMoreGamesScreen();
+        //app->ShowMoreGamesScreen();
+        app->ShowStatisticsScreen();
         break;
     case 4:
         app->DoConfirmQuitDialog();
@@ -181,12 +182,12 @@ void MainMenu::AddedToManager(WidgetManager *theWidgetManager)
     mArcadeButton->Layout(48, this, 452, 64, 0, 0);
     mGauntletButton->Layout(48, this, 436, 153, 0, 0);
     mOptionsButton->Layout(48, this, 418, 236, 0, 0);
-    mMoreGamesButton->Layout(48, this, 394, 305, 0, 0);
+    mStatsButton->Layout(48, this, 394, 305, 0, 0);
     mQuitButton->Layout(48, this, 496, 315, 0, 0);
 
     theWidgetManager->AddWidget(mArcadeButton);
     theWidgetManager->AddWidget(mGauntletButton);
-    theWidgetManager->AddWidget(mMoreGamesButton);
+    theWidgetManager->AddWidget(mStatsButton);
     theWidgetManager->AddWidget(mOptionsButton);
     theWidgetManager->AddWidget(mQuitButton);
     theWidgetManager->AddWidget(mNotYouLink);

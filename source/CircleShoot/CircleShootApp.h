@@ -16,6 +16,7 @@ namespace Sexy
     class MainMenu;
     class AdventureScreen;
     class PracticeScreen;
+    class StatisticsScreen;
     class CreditsScreen;
     class HelpScreen;
     class MoreGamesScreen;
@@ -34,6 +35,7 @@ namespace Sexy
         AdventureScreen *mAdventureScreen;
         HelpScreen *mHelpScreen;
         MoreGamesScreen *mMoreGamesScreen;
+        StatisticsScreen *mStatisticsScreen;
         LoadingScreen *mLoadingScreen;
         CreditsScreen *mCreditsScreen;
         WorkerThread *mWorkerThread;
@@ -87,6 +89,7 @@ namespace Sexy
         void LoadingThreadCompleted();
 
         void SwitchSong(int id);
+        void ShowStatisticsScreen();
         void PlaySong(int id, bool fade, double fadeSpeed);
 
         void DoCheckForUpdatesDialog();
@@ -123,6 +126,7 @@ namespace Sexy
         void ShowMainMenu();
         void ShowAdventureScreen(bool fromMenu, bool revealTemple);
         void ShowPracticeScreen(bool fromMenu);
+        void ShowStatisticsScreen(bool fromMenu);
         void ShowCreditsScreen(bool happyEnd);
         void ShowMoreGamesScreen();
 
