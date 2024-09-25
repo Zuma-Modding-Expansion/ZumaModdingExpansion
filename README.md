@@ -1,3 +1,8 @@
+# Zuma Deluxe Infinite Curve Mod (ICM)
+
+This is a mod that allow you to create levels with an infinite amount of curves, if you want 5 paths you can if you want 999 YOU CAN... you'll lag but you can.
+This mod has been made possible by Alula's Zuma Deluxe Decomp
+
 # Zuma Deluxe Decompilation
 
 Based on reverse engineering of Mac and Windows executables distributed on PopCap.com.
