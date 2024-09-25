@@ -23,21 +23,21 @@ const int yOffset = 19;
 
 StatisticsScreen::StatisticsScreen()
 {
-	mBackgroundImage = gSexyAppBase->GetImage("images/statistics_screen", 0);
+	//mBackgroundImage = gSexyAppBase->GetImage("images/statistics_screen", 0);
 	mMainMenuButton = MakeButton(0, this, "Main Menu", CircleButton::CB_ClickSound, NULL, 3);
 	GetCircleShootApp()->SaveProfile();
 }
 
 StatisticsScreen::~StatisticsScreen()
 {
-	delete mBackgroundImage;
+	//delete mBackgroundImage;
 	delete mMainMenuButton;
 }
 
 void StatisticsScreen::Draw(Graphics* g)
 {
 	Widget::Draw(g);
-	g->DrawImage(mBackgroundImage, 0, 0);
+	//g->DrawImage(mBackgroundImage, 0, 0);
 
 	UserStatistics* stat = &GetCircleShootApp()->mProfile->mUserStats;
 
