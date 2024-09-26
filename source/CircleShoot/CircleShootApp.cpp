@@ -44,6 +44,7 @@ CircleShootApp::CircleShootApp()
     mAutoEnable3D = true;
 
     mLevelParser = new LevelParser();
+    mInterfaceParser = new InterfaceParser();
     mProfileMgr = new ProfileMgr();
     mHighScoreMgr = new HighScoreMgr();
     mWidgetMover = new WidgetMover();
@@ -83,6 +84,7 @@ CircleShootApp::~CircleShootApp()
     // Sexy::GunDeleteGlobals()
 
     delete mLevelParser;
+    delete mInterfaceParser;
     delete mProfileMgr;
     delete mHighScoreMgr;
     delete mWidgetMover;
@@ -139,6 +141,19 @@ void CircleShootApp::Init()
         exit(0);
     }
 
+    if (!mInterfaceParser->ParseInterfaceFile("interfaces\\interfaces.xml"))
+    {
+        //Popup(mInterfaceParser.GetErrorText());
+        exit(0);
+    }
+
+    if (mInterfaceParser->i == 0)
+    {
+        Popup("No interfaces defined in interfaces.xml");
+        exit(0);
+    }
+
+
     // mResourceManager->SetAllowMissingProgramImages(true); // hack?
 
     LoadResourceManifest();
@@ -181,6 +196,7 @@ void CircleShootApp::Init()
     mMusicInterface->LoadMusic(1, "music\\zuma.mo3");
     PlaySong(24, false, 0.01);
     ShowLoadingScreen();
+    //ShowMainScreen();
 }
 
 void CircleShootApp::Shutdown()

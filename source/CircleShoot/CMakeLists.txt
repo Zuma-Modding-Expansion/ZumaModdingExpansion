@@ -38,7 +38,7 @@ add_executable(Zuma WIN32
     WidgetMover.cpp
     WorkerThread.cpp
     Zuma.rc
- "StatisticsScreen.h" "StatisticsScreen.cpp")
+ "StatisticsScreen.h" "StatisticsScreen.cpp" "InterfaceParser.h" "InterfaceParser.cpp")
 
 target_include_directories(Zuma PRIVATE
     ${SEXYAPP_INCLUDE_DIRS}

@@ -2,6 +2,7 @@
 #define __CIRCLESHOOTAPP_H__
 
 #include <SexyAppFramework/SexyAppBase.h>
+#include "InterfaceParser.h"
 
 namespace Sexy
 {
@@ -39,7 +40,8 @@ namespace Sexy
         LoadingScreen *mLoadingScreen;
         CreditsScreen *mCreditsScreen;
         WorkerThread *mWorkerThread;
-        LevelParser *mLevelParser;
+        LevelParser* mLevelParser;
+        InterfaceParser* mInterfaceParser;
         ProfileMgr *mProfileMgr;
         HighScoreMgr *mHighScoreMgr;
         UserProfile *mProfile;
