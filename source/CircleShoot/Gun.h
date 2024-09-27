@@ -70,6 +70,7 @@ public:
 	int GetCenterY() { return mCenterY; }
 	int GetWidth() { return mWidth; }
 	int GetHeight() { return mHeight; }
+	int GetFireSpeed() { return mFireVel; }
 	Bullet* GetBullet() { return mBullet; }
 	Bullet* GetNextBullet() { return mNextBullet; }
 	bool StartFire(bool recoil = true);

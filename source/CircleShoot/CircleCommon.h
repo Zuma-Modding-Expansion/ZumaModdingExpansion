@@ -49,6 +49,7 @@ namespace Sexy
         PowerType_Accuracy,
         PowerType_MoveBackwards,
         PowerType_Max,
+        PowerType_CannonShot,
         PowerType_None = 4,
     };
 

@@ -154,6 +154,13 @@ namespace Sexy
         IMAGE_ZUMA_BAR_ID,
         IMAGE_ZUMA_BAR_DONE_ID,
         IMAGE_FROG_LIVES_ID,
+        IMAGE_BALL_CANNON_ID,
+        IMAGE_BLUE_CANNON_ID,
+        IMAGE_YELLOW_CANNON_ID,
+        IMAGE_RED_CANNON_ID,
+        IMAGE_GREEN_CANNON_ID,
+        IMAGE_PURPLE_CANNON_ID,
+        IMAGE_WHITE_CANNON_ID,
         SOUND_BALLCLICK1_ID,
         SOUND_BALLCLICK2_ID,
         SOUND_BALLFIRE_ID,
@@ -409,6 +416,14 @@ namespace Sexy
     extern Image* IMAGE_ZUMA_BAR;
     extern Image* IMAGE_ZUMA_BAR_DONE;
     extern Image* IMAGE_FROG_LIVES;
+    extern Image* IMAGE_BALL_CANNON;
+    extern Image* IMAGE_BALL_CANNON;
+    extern Image* IMAGE_BLUE_CANNON;
+    extern Image* IMAGE_YELLOW_CANNON;
+    extern Image* IMAGE_RED_CANNON;
+    extern Image* IMAGE_GREEN_CANNON;
+    extern Image* IMAGE_PURPLE_CANNON;
+    extern Image* IMAGE_WHITE_CANNON;
     extern int SOUND_BALLCLICK1;
     extern int SOUND_BALLCLICK2;
     extern int SOUND_BALLFIRE;

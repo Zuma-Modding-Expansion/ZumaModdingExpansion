@@ -74,6 +74,7 @@ namespace Sexy
 		void DrawBomb(Graphics *g);
 		void DrawStandardPower(Graphics *g, int theBallImageId, int theBlinkImageId, int thePowerType);
 		void DrawPower(Graphics *g);
+		void DrawPowerShot(Graphics* g, int theBallImage, int thePowerType);
 		void DrawExplosion(Graphics *g);
 		void DoDraw(Graphics *g);
 

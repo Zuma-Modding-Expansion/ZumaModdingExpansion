@@ -153,6 +153,13 @@ static void *gResources[] =
         &IMAGE_ZUMA_BAR,
         &IMAGE_ZUMA_BAR_DONE,
         &IMAGE_FROG_LIVES,
+        &IMAGE_BALL_CANNON,
+        &IMAGE_BLUE_CANNON,
+        &IMAGE_YELLOW_CANNON,
+        &IMAGE_RED_CANNON,
+        &IMAGE_GREEN_CANNON,
+        &IMAGE_PURPLE_CANNON,
+        &IMAGE_WHITE_CANNON,
         &SOUND_BALLCLICK1,
         &SOUND_BALLCLICK2,
         &SOUND_BALLFIRE,
@@ -605,6 +612,13 @@ bool Sexy::ExtractLoadingThreadResources(ResourceManager *theMgr)
         IMAGE_ZUMA_BAR = aMgr.GetImageThrow("IMAGE_ZUMA_BAR");
         IMAGE_ZUMA_BAR_DONE = aMgr.GetImageThrow("IMAGE_ZUMA_BAR_DONE");
         IMAGE_FROG_LIVES = aMgr.GetImageThrow("IMAGE_FROG_LIVES");
+        IMAGE_BALL_CANNON = aMgr.GetImageThrow("IMAGE_BALL_CANNON");
+        IMAGE_BLUE_CANNON = aMgr.GetImageThrow("IMAGE_BLUE_CANNON");
+        IMAGE_YELLOW_CANNON = aMgr.GetImageThrow("IMAGE_YELLOW_CANNON");
+        IMAGE_RED_CANNON = aMgr.GetImageThrow("IMAGE_RED_CANNON");
+        IMAGE_GREEN_CANNON = aMgr.GetImageThrow("IMAGE_GREEN_CANNON");
+        IMAGE_PURPLE_CANNON = aMgr.GetImageThrow("IMAGE_PURPLE_CANNON");
+        IMAGE_WHITE_CANNON = aMgr.GetImageThrow("IMAGE_WHITE_CANNON");
         SOUND_BALLCLICK1 = aMgr.GetSoundThrow("SOUND_BALLCLICK1");
         SOUND_BALLCLICK2 = aMgr.GetSoundThrow("SOUND_BALLCLICK2");
         SOUND_BALLFIRE = aMgr.GetSoundThrow("SOUND_BALLFIRE");
@@ -722,6 +736,13 @@ Image *Sexy::IMAGE_MENU_BUTTON;
 Image *Sexy::IMAGE_ZUMA_BAR;
 Image *Sexy::IMAGE_ZUMA_BAR_DONE;
 Image *Sexy::IMAGE_FROG_LIVES;
+Image* Sexy::IMAGE_BALL_CANNON;
+Image* Sexy::IMAGE_BLUE_CANNON;
+Image* Sexy::IMAGE_YELLOW_CANNON;
+Image* Sexy::IMAGE_RED_CANNON;
+Image* Sexy::IMAGE_GREEN_CANNON;
+Image* Sexy::IMAGE_PURPLE_CANNON;
+Image* Sexy::IMAGE_WHITE_CANNON;
 int Sexy::SOUND_BALLCLICK1;
 int Sexy::SOUND_BALLCLICK2;
 int Sexy::SOUND_BALLFIRE;

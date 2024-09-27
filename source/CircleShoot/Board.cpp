@@ -595,14 +595,47 @@ void Board::UpdateBullets()
 void Board::UpdatePlaying()
 {
     Bullet *aBullet = mGun->GetFiredBullet();
-    if (aBullet)
+    if (aBullet) // CANNON TRISHOT
     {
         mBulletList.push_back(aBullet);
-        for (int i = 0; i < mCurveMgr.size(); i++)
+        if (aBullet->GetPowerType() == PowerType_CannonShot)
         {
-            aBullet->AddCurCurvePoint(0);
+            Bullet* bBullet = new Bullet();
+            bBullet->SetPowerType(PowerType_CannonShot, false);
+            float rad = mGun->GetAngle() - (SEXY_PI / 2) + 0.33f;
+            float vx = cosf(rad);
+            float vy = -sinf(rad);
+
+            bBullet->SetVelocity(vx * mGun->GetFireSpeed(), vy * mGun->GetFireSpeed());
+            bBullet->SetPos(aBullet->GetX(), aBullet->GetY());
+            mBulletList.push_back(bBullet);
+
+            Bullet* cBullet = new Bullet();
+            cBullet->SetPowerType(PowerType_CannonShot, false);
+            rad = mGun->GetAngle() - (SEXY_PI / 2) - 0.33f;
+            vx = cosf(rad);
+            vy = -sinf(rad);
+
+            cBullet->SetVelocity(vx * mGun->GetFireSpeed(), vy * mGun->GetFireSpeed());
+            cBullet->SetPos(aBullet->GetX(), aBullet->GetY());
+            mBulletList.push_back(cBullet);
+
+            for (int i = 0; i < mCurveMgr.size(); i++)
+            {
+                aBullet->AddCurCurvePoint(0);
+                bBullet->AddCurCurvePoint(0);
+                cBullet->AddCurCurvePoint(0);
+            }
+            CheckReload();
         }
-        CheckReload();
+        else
+        {
+            for (int i = 0; i < mCurveMgr.size(); i++)
+            {
+                aBullet->AddCurCurvePoint(0);
+            }
+            CheckReload();
+        }
     }
 
     UpdateBullets();
@@ -1616,6 +1649,10 @@ void Board::KeyChar(char theChar)
         {
             gColorOverride = 0;
         }
+    }
+    else if (c == 'Q') // CANNON OVERRIDE
+    {
+        mGun->GetBullet()->SetPowerType(PowerType_CannonShot, false);
     }
 #endif
 }

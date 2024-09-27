@@ -664,6 +664,25 @@ void Ball::DrawStandardPower(Graphics *g, int theBallImageId, int theBlinkImageI
     g->SetDrawMode(Graphics::DRAWMODE_NORMAL);
 }
 
+void Ball::DrawPowerShot(Graphics* g, int theBallImage, int thePowerType)
+{
+        Image* image = Sexy::GetImageById((ResourceId)(theBallImage));
+        float aBallX = mx - 16.0f;
+        float aBallY = my - 16.0f;
+        int aFrame = (mStartFrame + (int)mWayPoint) % image->mNumRows;
+
+      /*  if (gSexyAppBase->Is3DAccelerated())
+        { */
+            int aCelHeight = image->mHeight / image->mNumRows;
+            Rect aRect(0, aFrame * aCelHeight, image->mWidth, aCelHeight);
+            g->DrawImageRotatedF(image, aBallX, aBallY, mRotation, &aRect);
+        /* }
+        else
+        {
+            BlendedImage* aBlendedBall = CreateBlendedBall(mType);
+            aBlendedBall->Draw(g, aBallX, aBallY);
+        } */  
+}
 void Ball::DrawPower(Graphics *g)
 {
     switch (mPowerType)
@@ -679,6 +698,9 @@ void Ball::DrawPower(Graphics *g)
         break;
     case PowerType_MoveBackwards:
         DrawStandardPower(g, Sexy::IMAGE_BLUE_BACKWARDS_ID, Sexy::IMAGE_BACKWARDS_LIGHT_ID, PowerType_MoveBackwards);
+        break;
+    case PowerType_CannonShot:
+        DrawPowerShot(g, Sexy::IMAGE_BALL_CANNON_ID, PowerType_CannonShot);
         break;
     }
 }

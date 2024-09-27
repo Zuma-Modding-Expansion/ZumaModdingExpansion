@@ -413,12 +413,12 @@ bool CurveMgr::CheckCollision(Bullet *theBullet)
 
         ball = *aBallItr;
 
-        if (ball->CollidesWithPhysically(theBullet) && ball->GetBullet() == NULL && ball->GetClearCount() == 0)
+        if (ball->CollidesWithPhysically(theBullet) && ball->GetBullet() == NULL && ball->GetClearCount() == 0 && theBullet->GetPowerType() != PowerType_CannonShot)
         {
-            Ball *aPrevBall = ball->GetPrevBall(true);
+            Ball* aPrevBall = ball->GetPrevBall(true);
             if (aPrevBall == NULL || aPrevBall->GetBullet() == NULL)
             {
-                Ball *aNextBall = ball->GetNextBall(true);
+                Ball* aNextBall = ball->GetNextBall(true);
                 if (aNextBall == NULL || aNextBall->GetBullet() == NULL)
                 {
                     SexyVector3 v(ball->GetX(), ball->GetY(), 0.0f);
@@ -432,6 +432,14 @@ bool CurveMgr::CheckCollision(Bullet *theBullet)
                     }
                 }
             }
+        }
+
+        if (ball->CollidesWithPhysically(theBullet) && ball->GetClearCount() == 0 && theBullet->GetPowerType() == PowerType_CannonShot)
+        {
+            // ShowTextPower(ball); TODO : afficher du texte pour les powerups cassés par le cannon
+            StartClearCount(ball);
+            mApp->PlaySample(Sexy::SOUND_BALLDESTROYED1);
+
         }
     }
 
@@ -1796,7 +1804,7 @@ void CurveMgr::AdvanceMergingBullet(BulletList::iterator &theBulletItr)
 
     Ball *aPushBall = aBul->GetPushBall();
 
-    if (aPushBall != NULL)
+    if (aPushBall != NULL && aBul->GetPowerType() != PowerType_CannonShot)
     {
         float num = 1.0f - aBul->GetHitPercent();
         float f = -aBul->GetRadius() * num / 2.0f;
@@ -1821,7 +1829,7 @@ void CurveMgr::AdvanceMergingBullet(BulletList::iterator &theBulletItr)
         aPushBall->SetNeedCheckCollision(true);
     }
 
-    if (aBul->GetHitPercent() >= 1.0f)
+    if (aBul->GetHitPercent() >= 1.0f && aBul->GetPowerType() != PowerType_CannonShot)
     {
         BallList::iterator aBallItr = aHitBall->GetListItr();
         if (aBul->GetHitInFront())
