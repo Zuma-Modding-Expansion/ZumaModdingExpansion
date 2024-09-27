@@ -230,7 +230,7 @@ void Ball::SetPowerType(PowerType theType, bool delay)
 {
     if (theType == mPowerType)
         return;
-
+    
     if (delay)
     {
         mDestPowerType = theType;
@@ -698,6 +698,9 @@ void Ball::DrawPower(Graphics *g)
         break;
     case PowerType_MoveBackwards:
         DrawStandardPower(g, Sexy::IMAGE_BLUE_BACKWARDS_ID, Sexy::IMAGE_BACKWARDS_LIGHT_ID, PowerType_MoveBackwards);
+        break;
+    case PowerType_Cannon:
+        DrawStandardPower(g, Sexy::IMAGE_BLUE_CANNON_ID, Sexy::IMAGE_CANNON_LIGHT_ID, PowerType_Cannon);
         break;
     case PowerType_CannonShot:
         DrawPowerShot(g, Sexy::IMAGE_BALL_CANNON_ID, PowerType_CannonShot);

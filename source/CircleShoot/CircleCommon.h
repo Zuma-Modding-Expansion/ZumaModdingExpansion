@@ -48,9 +48,10 @@ namespace Sexy
         PowerType_SlowDown,
         PowerType_Accuracy,
         PowerType_MoveBackwards,
+        PowerType_Cannon,
         PowerType_Max,
+        PowerType_None = 5,
         PowerType_CannonShot,
-        PowerType_None = 4,
     };
 
     enum DialogType

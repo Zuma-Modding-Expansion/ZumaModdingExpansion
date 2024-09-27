@@ -781,6 +781,7 @@ bool LevelParser::DoParseLevel(XMLElement &theElem, bool isLevel)
     GetCurveAttribute(aDesc, theElem, "slowfreq", offsetof(CurveDesc, mPowerUpFreq[PowerType_SlowDown]), ParseInt);
     GetCurveAttribute(aDesc, theElem, "accfreq", offsetof(CurveDesc, mPowerUpFreq[PowerType_Accuracy]), ParseInt);
     GetCurveAttribute(aDesc, theElem, "backfreq", offsetof(CurveDesc, mPowerUpFreq[PowerType_MoveBackwards]), ParseInt);
+    GetCurveAttribute(aDesc, theElem, "cannonfreq", offsetof(CurveDesc, mPowerUpFreq[PowerType_Cannon]), ParseInt);
     GetCurveAttribute(aDesc, theElem, "repeat", offsetof(CurveDesc, mBallRepeat), ParseInt);
     GetCurveAttribute(aDesc, theElem, "single", offsetof(CurveDesc, mMaxSingle), ParseInt);
     GetCurveAttribute(aDesc, theElem, "mergespeed", offsetof(CurveDesc, mMergeSpeed), ParseFloat);

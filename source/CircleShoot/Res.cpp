@@ -160,6 +160,8 @@ static void *gResources[] =
         &IMAGE_GREEN_CANNON,
         &IMAGE_PURPLE_CANNON,
         &IMAGE_WHITE_CANNON,
+        &IMAGE_CANNON_LIGHT,
+        &IMAGE_CANNON_VISUAL,
         &SOUND_BALLCLICK1,
         &SOUND_BALLCLICK2,
         &SOUND_BALLFIRE,
@@ -197,6 +199,8 @@ static void *gResources[] =
         &SOUND_CHORAL1,
         &SOUND_POP,
         &SOUND_UFO,
+        &SOUND_CANNONPOWER,
+        &SOUND_CANNONFIRE,
         &FONT_HUGE,
         &FONT_MONODIGIT,
         &FONT_BROWNTITLE,
@@ -619,6 +623,8 @@ bool Sexy::ExtractLoadingThreadResources(ResourceManager *theMgr)
         IMAGE_GREEN_CANNON = aMgr.GetImageThrow("IMAGE_GREEN_CANNON");
         IMAGE_PURPLE_CANNON = aMgr.GetImageThrow("IMAGE_PURPLE_CANNON");
         IMAGE_WHITE_CANNON = aMgr.GetImageThrow("IMAGE_WHITE_CANNON");
+        IMAGE_CANNON_LIGHT = aMgr.GetImageThrow("IMAGE_CANNON_LIGHT");
+        IMAGE_CANNON_VISUAL = aMgr.GetImageThrow("IMAGE_CANNON_VISUAL");
         SOUND_BALLCLICK1 = aMgr.GetSoundThrow("SOUND_BALLCLICK1");
         SOUND_BALLCLICK2 = aMgr.GetSoundThrow("SOUND_BALLCLICK2");
         SOUND_BALLFIRE = aMgr.GetSoundThrow("SOUND_BALLFIRE");
@@ -656,6 +662,8 @@ bool Sexy::ExtractLoadingThreadResources(ResourceManager *theMgr)
         SOUND_CHORAL1 = aMgr.GetSoundThrow("SOUND_CHORAL1");
         SOUND_POP = aMgr.GetSoundThrow("SOUND_POP");
         SOUND_UFO = aMgr.GetSoundThrow("SOUND_UFO");
+        SOUND_CANNONPOWER = aMgr.GetSoundThrow("SOUND_CANNONPOWER");
+        SOUND_CANNONFIRE = aMgr.GetSoundThrow("SOUND_CANNONFIRE");
     }
     catch (ResourceManagerException &)
     {
@@ -743,6 +751,8 @@ Image* Sexy::IMAGE_RED_CANNON;
 Image* Sexy::IMAGE_GREEN_CANNON;
 Image* Sexy::IMAGE_PURPLE_CANNON;
 Image* Sexy::IMAGE_WHITE_CANNON;
+Image* Sexy::IMAGE_CANNON_LIGHT;
+Image* Sexy::IMAGE_CANNON_VISUAL;
 int Sexy::SOUND_BALLCLICK1;
 int Sexy::SOUND_BALLCLICK2;
 int Sexy::SOUND_BALLFIRE;
@@ -780,3 +790,5 @@ int Sexy::SOUND_BUTTON2;
 int Sexy::SOUND_CHORAL1;
 int Sexy::SOUND_POP;
 int Sexy::SOUND_UFO;
+int Sexy::SOUND_CANNONPOWER;
+int Sexy::SOUND_CANNONFIRE;

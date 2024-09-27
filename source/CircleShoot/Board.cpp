@@ -7,6 +7,7 @@
 #include <SexyAppFramework/ButtonListener.h>
 #include <SexyAppFramework/Font.h>
 #include <SexyAppFramework/WidgetManager.h>
+#include <SexyAppFramework/SexyMatrix.h>
 
 #include "Ball.h"
 #include "Board.h"
@@ -28,6 +29,7 @@
 #include "Res.h"
 #include "WayPoint.h"
 #include "WorkerThread.h"
+
 
 using namespace Sexy;
 
@@ -1125,6 +1127,82 @@ void Board::DrawPlaying(Graphics *g)
     }
 
     DrawBullets(g);
+
+    if (mGun->GetBullet() != NULL && mGun->GetBullet()->GetPowerType() == PowerType_CannonShot)
+    {
+        const int anim_time = 150;
+        int frame = GetBoardStateCount() % anim_time;
+        float anim_percent = (float)frame / (float)anim_time;
+
+        g->SetColorizeImages(true);
+        for (int i = 0; i < 3; i++) {
+            int alpha = 255;
+            if (i == 2) {
+                alpha = 255 * (1 - pow(1.0 - anim_percent, 4.0)); // apply ease
+            }
+            else if (i == 0) {
+                alpha = 255 - 255 * (anim_percent * anim_percent * anim_percent * anim_percent); // apply ease
+            }
+            g->SetColor(Color(255, 255, 255, alpha));
+
+            float distancefromGun = (200.0f - 75.0f * i) + 75.0f * anim_percent; // offset from frog
+            float gunX = (float)mGun->GetCenterX();
+            float gunY = (float)mGun->GetCenterY();
+            float angle = mGun->GetAngle();
+
+            float scale = (0.35f * anim_percent) + 1.15f - 0.35f * i;
+            float scalex = scale * (1 - (0.3f * i) + 0.3f * anim_percent);
+            float scaley = scale;
+
+            float posX = gunX + distancefromGun * sin(angle);
+            float posY = gunY + distancefromGun * cos(angle);
+
+            if (mApp->Is3DAccelerated()) {
+                Sexy::Transform aTrans = Sexy::Transform();
+                aTrans.Scale(scalex, scaley);
+                aTrans.RotateRad(angle + SEXY_PI);
+                aTrans.Translate(posX, posY);
+                g->DrawImageTransformF(Sexy::IMAGE_CANNON_VISUAL, aTrans);
+            }
+            else {
+                g->DrawImageRotatedF(Sexy::IMAGE_CANNON_VISUAL, posX - 20, posY - 20, (float)angle + SEXY_PI);
+            }
+
+            float lateralOffset = (48.75f - 24.375f * i) + 24.375 * anim_percent; // angle offset
+            float cDistance = distancefromGun * -0.1f; // closer distance for 2nd and 3rd 
+
+            float posX2 = posX + cDistance * sin(angle) - lateralOffset * cos(angle);
+            float posY2 = posY + cDistance * cos(angle) + lateralOffset * sin(angle);
+
+            if (mApp->Is3DAccelerated()) {
+                Sexy::Transform aTrans = Sexy::Transform();
+                aTrans.Scale(scalex, scaley);
+                aTrans.RotateRad(angle + SEXY_PI - 0.35f);
+                aTrans.Translate(posX2, posY2);
+                g->DrawImageTransformF(Sexy::IMAGE_CANNON_VISUAL, aTrans);
+            }
+            else {
+                g->DrawImageRotatedF(Sexy::IMAGE_CANNON_VISUAL, posX2 - 20, posY2 - 20, (float)angle + SEXY_PI - 0.35f);
+            }
+
+
+            float posX3 = posX + cDistance * sin(angle) + lateralOffset * cos(angle);
+            float posY3 = posY + cDistance * cos(angle) - lateralOffset * sin(angle);
+
+
+            if (mApp->Is3DAccelerated()) {
+                Sexy::Transform aTrans = Sexy::Transform();
+                aTrans.Scale(scalex, scaley);
+                aTrans.RotateRad(angle + SEXY_PI + 0.35f);
+                aTrans.Translate(posX3, posY3);
+                g->DrawImageTransformF(Sexy::IMAGE_CANNON_VISUAL, aTrans);
+            }
+            else {
+                g->DrawImageRotatedF(Sexy::IMAGE_CANNON_VISUAL, posX3 - 20, posY3 - 20, (float)angle + SEXY_PI + 0.35f);
+            }
+        }
+        g->SetColorizeImages(false);
+    }
 }
 
 void Board::DrawLosing(Graphics *g)
@@ -1478,12 +1556,18 @@ void Board::MouseDown(int x, int y, int theClickCount)
             {
                 if (mGun->StartFire())
                 {
+                    if (mGun->GetBullet()->GetPowerType() == PowerType_CannonShot)
+                    {
+                        mApp->PlaySample(Sexy::SOUND_CANNONFIRE);
+                        return;
+                    }
                     mApp->PlaySample(Sexy::SOUND_BALLFIRE);
                 }
             }
             else
             {
-                mGun->SwapBullets();
+                if (mGun->GetBullet()->GetPowerType() != PowerType_CannonShot)
+                    mGun->SwapBullets();
             }
         }
         else
@@ -1652,7 +1736,8 @@ void Board::KeyChar(char theChar)
     }
     else if (c == 'Q') // CANNON OVERRIDE
     {
-        mGun->GetBullet()->SetPowerType(PowerType_CannonShot, false);
+        if (mGun->GetBullet() != NULL)
+            mGun->GetBullet()->SetPowerType(PowerType_CannonShot, false);
     }
 #endif
 }
@@ -1745,6 +1830,13 @@ void Board::ActivatePower(Ball *theBall)
         mApp->PlaySample(Sexy::SOUND_ACCURACY_BALL);
         mAccuracyCount = 2000;
         DoAccuracy(true);
+        break;
+    case PowerType_Cannon:
+        if (mGun->GetBullet() != NULL)
+        {
+            mApp->PlaySample(Sexy::SOUND_CANNONPOWER);
+            mGun->GetBullet()->SetPowerType(PowerType_CannonShot, false);
+        }
         break;
     }
 

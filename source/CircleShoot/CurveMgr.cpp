@@ -436,8 +436,8 @@ bool CurveMgr::CheckCollision(Bullet *theBullet)
 
         if (ball->CollidesWithPhysically(theBullet) && ball->GetClearCount() == 0 && theBullet->GetPowerType() == PowerType_CannonShot)
         {
-            // ShowTextPower(ball); TODO : afficher du texte pour les powerups cassés par le cannon
             StartClearCount(ball);
+            ShowTextPower(ball);
             mApp->PlaySample(Sexy::SOUND_BALLDESTROYED1);
 
         }
@@ -623,7 +623,7 @@ Ball *CurveMgr::CheckBallIntersection(const SexyVector3 &p1, const SexyVector3 &
     return anIntersectBall;
 }
 
-bool gGotPowerUp[(int)PowerType_Max] = {false, false, false, false};
+bool gGotPowerUp[(int)PowerType_Max] = {false, false, false, false, false};
 
 void CurveMgr::ActivatePower(Ball *theBall)
 {
@@ -1256,6 +1256,33 @@ void CurveMgr::DoScoring(Ball *theBall, int theNumBalls, int theComboCount, int 
     {
         aFloat.AddText("ACCURACY Ball", Sexy::FONT_FLOAT_ID, theColor);
     }
+
+    if (gGotPowerUp[PowerType_Cannon])
+    {
+        aFloat.AddText("CANNON Ball", Sexy::FONT_FLOAT_ID, theColor);
+    }
+
+    aFloat.AddToMgr(mBoard->mParticleMgr, aClrX, aClrY);
+}
+
+void CurveMgr::ShowTextPower(Ball* theBall)
+{
+    FloatingTextHelper aFloat;
+    float aClrX = theBall->GetX();
+    float aClrY = theBall->GetY();
+    int theColor = Sexy::gBallColors[theBall->GetType()];
+
+    if (theBall->GetPowerType() == PowerType_SlowDown)
+        aFloat.AddText("SLOWDOWN Ball", Sexy::FONT_FLOAT_ID, theColor);
+
+    if (theBall->GetPowerType() == PowerType_MoveBackwards)
+        aFloat.AddText("BACKWARDS Ball", Sexy::FONT_FLOAT_ID, theColor);
+
+    if (theBall->GetPowerType() == PowerType_Accuracy)
+        aFloat.AddText("ACCURACY Ball", Sexy::FONT_FLOAT_ID, theColor);
+
+    if (theBall->GetPowerType() == PowerType_Cannon)
+        aFloat.AddText("CANNON Ball", Sexy::FONT_FLOAT_ID, theColor);
 
     aFloat.AddToMgr(mBoard->mParticleMgr, aClrX, aClrY);
 }

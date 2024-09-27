@@ -139,7 +139,7 @@ namespace Sexy
 		Ball *CheckBallIntersection(const SexyVector3 &p1, const SexyVector3 &v1, float &t);
 
 		void ActivatePower(Ball *theBall);
-
+		void ShowTextPower(Ball* theBall);
 		void DrawCurve(CurveDrawer &theDrawer);
 		void DrawTunnel(CurveDrawer &theDrawer);
 		void DeleteBalls();

@@ -161,6 +161,8 @@ namespace Sexy
         IMAGE_GREEN_CANNON_ID,
         IMAGE_PURPLE_CANNON_ID,
         IMAGE_WHITE_CANNON_ID,
+        IMAGE_CANNON_LIGHT_ID,
+        IMAGE_CANNON_VISUAL_ID,
         SOUND_BALLCLICK1_ID,
         SOUND_BALLCLICK2_ID,
         SOUND_BALLFIRE_ID,
@@ -198,6 +200,8 @@ namespace Sexy
         SOUND_CHORAL1_ID,
         SOUND_POP_ID,
         SOUND_UFO_ID,
+        SOUND_CANNONPOWER_ID,
+        SOUND_CANNONFIRE_ID,
         FONT_HUGE_ID,
         FONT_MONODIGIT_ID,
         FONT_BROWNTITLE_ID,
@@ -424,6 +428,8 @@ namespace Sexy
     extern Image* IMAGE_GREEN_CANNON;
     extern Image* IMAGE_PURPLE_CANNON;
     extern Image* IMAGE_WHITE_CANNON;
+    extern Image* IMAGE_CANNON_LIGHT;
+    extern Image* IMAGE_CANNON_VISUAL;
     extern int SOUND_BALLCLICK1;
     extern int SOUND_BALLCLICK2;
     extern int SOUND_BALLFIRE;
@@ -461,6 +467,8 @@ namespace Sexy
     extern int SOUND_CHORAL1;
     extern int SOUND_POP;
     extern int SOUND_UFO;
+    extern int SOUND_CANNONPOWER;
+    extern int SOUND_CANNONFIRE;
 };
 
 #endif
