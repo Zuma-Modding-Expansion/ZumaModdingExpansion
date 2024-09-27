@@ -436,9 +436,12 @@ bool CurveMgr::CheckCollision(Bullet *theBullet)
 
         if (ball->CollidesWithPhysically(theBullet) && ball->GetClearCount() == 0 && theBullet->GetPowerType() == PowerType_CannonShot)
         {
-            StartClearCount(ball);
-            ShowTextPower(ball);
-            mApp->PlaySample(Sexy::SOUND_BALLDESTROYED1);
+            if (!mWayPointMgr->InTunnel(ball->GetWayPoint()))
+            {
+                StartClearCount(ball);
+                ShowTextPower(ball);
+                mApp->PlaySample(Sexy::SOUND_BALLDESTROYED1);
+            }
 
         }
     }

@@ -44,6 +44,7 @@ Gun::Gun()
     mNextBullet = NULL;
     mCachedGunImage = NULL;
     mCachedGunAngle = 0.0f;
+    mTheGunType = 0;
     mShowNextBall = true;
 }
 
@@ -236,6 +237,10 @@ void Gun::DrawShadow(Graphics *g)
 {
     // empty
 }
+void Gun::SetGunType(int thetype)
+{
+    mTheGunType = thetype;
+}
 
 bool Gun::StartFire(bool recoil)
 {
@@ -262,7 +267,7 @@ bool Gun::StartFire(bool recoil)
     mRecoilX2 = mCenterX + vx * -6.0f;
     mRecoilY2 = mCenterY + vy * -6.0f;
 
-    if (recoil)
+    if (recoil && mTheGunType == 0)
         mRecoilCount = 25;
 
     mWink = false;

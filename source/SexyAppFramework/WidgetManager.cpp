@@ -670,16 +670,16 @@ bool WidgetManager::MouseDown(int x, int y, int theClickCount)
 	return true;
 }
 
-bool WidgetManager::MouseMove(int x, int y) 
-{	
+bool WidgetManager::MouseMove(int x, int y)
+{
 	mLastInputUpdateCnt = mUpdateCnt;
 
-	if (mDownButtons)
-		return MouseDrag(x,y);
-
 	mMouseIn = true;
-	MousePosition(x, y);	
-			
+	MousePosition(x, y);
+
+	if (mDownButtons)
+		return MouseDrag(x, y);
+
 	return true;
 }
 

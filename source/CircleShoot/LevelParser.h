@@ -89,7 +89,10 @@ namespace Sexy
 		std::string mImagePath;
 		float mFireSpeed;
 		int mReloadDelay;
+		int mGunType;
 		int mGunX, mGunY;
+		int mGunWidth;
+		int mGunHeight;
 		int mBGColor;
 		int mDifficulty;
 		int mHueRot;

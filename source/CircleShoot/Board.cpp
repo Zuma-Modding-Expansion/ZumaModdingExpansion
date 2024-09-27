@@ -287,7 +287,9 @@ void Board::StartLevel()
     mParticleMgr->Clear();
     mTransitionMgr->Clear();
     mGun->SetFireSpeed(mLevelDesc->mFireSpeed);
-    mGun->SetPos(mLevelDesc->mGunX, mLevelDesc->mGunY);
+    if (mLevelDesc->mGunType == 0)
+        mGun->SetPos(mLevelDesc->mGunX, mLevelDesc->mGunY);
+    mGun->SetGunType(mLevelDesc->mGunType);
     mSoundMgr->PlayLoop(LoopType_RollIn);
     for (CurveMgr* i : mCurveMgr) {
         i->StartLevel();
@@ -1501,29 +1503,64 @@ void Board::MouseMove(int x, int y)
     if (mPauseCount != 0)
         return;
 
-    int fromCenterX = x - mGun->GetCenterX();
-    float angle;
-
-    if (fromCenterX != 0)
+    switch (mLevelDesc->mGunType)
     {
-        float v4 = atanf((float)(mGun->GetCenterY() - y) / (float)fromCenterX);
-        if (fromCenterX < 0)
+        case 0:
         {
-            v4 += SEXY_PI;
-        }
+            int fromCenterX = x - mGun->GetCenterX(); /// RADIAL
+            float angle;
 
-        angle = v4 + (SEXY_PI / 2.0);
-    }
-    else
-    {
-        angle = 0.0f;
-        if (y < mGun->GetCenterY())
+            if (fromCenterX != 0)
+            {
+                float v4 = atanf((float)(mGun->GetCenterY() - y) / (float)fromCenterX);
+                if (fromCenterX < 0)
+                {
+                    v4 += SEXY_PI;
+                }
+
+                angle = v4 + (SEXY_PI / 2.0);
+            }
+            else
+            {
+                angle = 0.0f;
+                if (y < mGun->GetCenterY())
+                {
+                    angle = SEXY_PI;
+                }
+            }
+            mGun->SetAngle(angle);
+            break;
+        }
+        case 1:
         {
-            angle = SEXY_PI;
+            if (x < mLevelDesc->mGunX + mLevelDesc->mGunWidth / 2 && x > mLevelDesc->mGunX - mLevelDesc->mGunWidth / 2 && mGameState == GameState_Playing)
+                mGun->SetPos(x, mGun->GetCenterY()); // HORIZ
+            if (y < mGun->GetCenterY())
+            {
+                mGun->SetAngle(SEXY_PI);
+            }
+            else
+            {
+                mGun->SetAngle(SEXY_PI * 2);
+            }
+            break;
+        }
+        case 2:
+        {
+            if (y < mLevelDesc->mGunY + mLevelDesc->mGunHeight / 2 && y > mLevelDesc->mGunY - mLevelDesc->mGunHeight / 2 && mGameState == GameState_Playing)
+                mGun->SetPos(mGun->GetCenterX(), y); // VERT
+
+            if (x < mGun->GetCenterX())
+            {
+                mGun->SetAngle(SEXY_PI * 1.5f);
+            }
+            else
+            {
+                mGun->SetAngle(SEXY_PI / 2.0f);
+            }
+            break;
         }
     }
-
-    mGun->SetAngle(angle);
     mRecalcGuide = true;
     MarkDirty();
 }

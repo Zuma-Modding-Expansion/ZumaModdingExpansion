@@ -52,6 +52,9 @@ LevelDesc::LevelDesc()
 {
     mDifficulty = 0;
     mHueRot = 0;
+    mGunType = 0;
+    mGunWidth = CIRCLE_WINDOW_WIDTH - 54;
+    mGunHeight = CIRCLE_WINDOW_HEIGHT - 54;
     mGunX = 320;
     mGunY = 240;
     mFireSpeed = 6.0;
@@ -407,7 +410,9 @@ void LevelParser::CopyGraphics(LevelDesc &to, LevelDesc &from)
             to.mCurveDesc.push_back(*todesc);
         }
     }
-
+    to.mGunType = from.mGunType;
+    to.mGunWidth = from.mGunWidth;
+    to.mGunHeight = from.mGunHeight;
     to.mGunX = from.mGunX;
     to.mGunY = from.mGunY;
     to.mBGColor = from.mBGColor;
@@ -721,6 +726,15 @@ bool LevelParser::DoParseLevel(XMLElement &theElem, bool isLevel)
 
     if (GetAttribute(theElem, "bgcolor", aVal))
         sscanf(aVal.c_str(), "%x", &aDesc.mBGColor);
+
+    if (GetAttribute(theElem, "guntype", aVal))
+        sscanf(aVal.c_str(), "%d", &aDesc.mGunType);
+
+    if (GetAttribute(theElem, "width", aVal))
+        sscanf(aVal.c_str(), "%d", &aDesc.mGunWidth);
+
+    if (GetAttribute(theElem, "height", aVal))
+        sscanf(aVal.c_str(), "%d", &aDesc.mGunHeight);
 
     if (GetAttribute(theElem, "gx", aVal))
         sscanf(aVal.c_str(), "%d", &aDesc.mGunX);

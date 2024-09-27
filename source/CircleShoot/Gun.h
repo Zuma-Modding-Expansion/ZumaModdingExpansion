@@ -32,6 +32,7 @@ protected:
 	int mRecoilX2, mRecoilY2;
 	int mRecoilCount;
 	int mWidth, mHeight;
+	int mTheGunType;
 	Bullet *mBullet;
 	Bullet *mNextBullet;
 
@@ -78,6 +79,7 @@ public:
 
 	void SetPos(int theX, int theY);
 	void SetSize(int theWidth, int theHeight);
+	void SetGunType(int thetype);
 	float GetAngle() { return mAngle; }
 	float GetCachedGunAngle() { return mCachedGunAngle; }
 	bool IsFiring() { return mState == GunState_Firing; }
