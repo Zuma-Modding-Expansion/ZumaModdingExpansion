@@ -1124,8 +1124,11 @@ void Board::DrawPlaying(Graphics *g)
             anAlpha = (120 * mAccuracyCount) / 300 + 8;
         }
 
-        g->SetColor(Color(0, 255, 255, anAlpha));
-        g->PolyFill(mGuide, 4, false);
+        if (mGun->GetBullet() != NULL && mGun->GetBullet()->GetPowerType() != PowerType_CannonShot)
+        {
+            g->SetColor(Color(Sexy::gBallColors[mGun->GetBullet()->GetType()], anAlpha));
+            g->PolyFill(mGuide, 4, false);
+        }
     }
 
     DrawBullets(g);
