@@ -2023,6 +2023,9 @@ void Board::SyncState(DataSync &theSync)
         for (int i = 0; i < aBulletCount; i++)
         {
             Bullet *aBullet = new Bullet();
+            for (int j = 0; j < mCurveMgr.size(); j++) {
+                aBullet->AddCurCurvePoint(0);
+            }
             aBullet->SyncState(theSync);
             mBulletList.push_back(aBullet);
         }
